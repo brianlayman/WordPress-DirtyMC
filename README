@@ -1,0 +1,5 @@
+This solution is uses output buffer caching to provide the fastest possible caching solution possible for a WordPress website. 
+
+It caches only non-logged-in access of the pages and after a page is first generated, it loads NONE of WordPess.  This means it has a lower execution cost than any WordPress plugin can achieve.
+
+This solution was inspired and originaly coded by Henry Rivera.
