@@ -1,5 +1,5 @@
 <?php
-// This is a modifed version of the standard WordPress index.php. You
+// This is a modified version of the standard WordPress index.php. You
 
 // Include the memcache server configuration
 if ( file_exists( 'dirtymc-config.php' ) ) require_once( 'dirtymc-config.php' );
@@ -7,8 +7,14 @@ if ( file_exists( 'dirtymc-config.php' ) ) require_once( 'dirtymc-config.php' );
 // Load the dirty memcache engine
 require_once( 'dirtymc.php' );
 
+// Check for the cookie hash ID. The changes in WP 3.6 require this.
+if ( !defined( 'DMC_COOKIEHASH' ) ) { 
+    echo( 'You must define DMC_COOKIEHASH for DirtyMC to work.' ); 
+    die( 'You must define DMC_COOKIEHASH for DirtyMC to work.' ); 
+}
+
 // Only for anonymous requests on landing.
-if ( !isset( $_COOKIE['wordpress_logged_in_'] ) and ( $_SERVER['REQUEST_URI'] != '/signup/' ) and ( substr( $_SERVER['REQUEST_URI'], 0, 6 ) != '/login' ) ){
+if ( !isset( $_COOKIE[ 'wordpress_logged_in_' . DMC_COOKIEHASH ] ) and ( isset( $NonCached[ $_SERVER['REQUEST_URI'] ] ) ) ) {
 	$dirtyMC = dmc_doMemcacheConnect();
 	$dirtyMCVersion = $dirtyMC->get( DMC_VERSION_KEY_LABEL );
 	dmc_doStampedeProtection( dmc_getMemcacheKey() );

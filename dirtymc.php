@@ -8,8 +8,10 @@ Author URI: http://webdevstudios.com/team/brian-layman/
 Script URI: http://webdevstudios.com/wordpress/vip-services-support/
 
 Notes: 
-	It caches only non-logged-in access of the pages and after a page is first generated, it loads NONE of WordPess.  This means it has a lower execution cost than any WordPress plugin can achieve.
-	This solution was inspired and originaly coded by Henry Rivera.
+	This tool caches only non-logged-in access of the pages.  
+	After a page is first generated, it loads NONE of WordPess.  
+	This means it has a lower execution cost than any WordPress plugin can achieve.
+	This solution was inspired and originally coded by Henry Rivera.
 
 Use: Place this script in the root of your WordPress install, 
 	If needed, include a file named dirtymc-config.php in the root. That file should contain any custom definitions of the constants defined below. It is likely that you would at least define a memcache server.
@@ -35,6 +37,50 @@ if ( !defined( 'DMC_DMC_VERSION_KEY_LABEL' ) ) define( 'DMC_DMC_VERSION_KEY_LABE
 if ( !defined( 'DMC_FLUSH_ARGUMENT' ) ) define( 'DMC_FLUSH_ARGUMENT', 'flush_main_cache' ); // Sent in the url, this will simulate a full cache flush, though in reality it just changes all key names
 if ( !defined( 'DMC_VERSION_DURATION' ) ) define( 'DMC_VERSION_DURATION', 60 * 60 * 24 ); // The absolute max time in seconds before all cached values are considered invalid
 if ( !defined( 'DMC_MEMCACHE_ANON_CACHE_TIME' ) ) define('DMC_MEMCACHE_ANON_CACHE_TIME', 60 * 5);  // The time in seconds that a normal value will remain cached.
+if ( !defined( 'DMC_COOKIEHASH' ) ) define( 'DMC_COOKIEHASH', md5( ( dmc_is_ssl() ? 'https://': 'http://' ) . dmc_get_host() ) );
+if ( !isset( $NonCached ) ) {
+	// Non-Cached Pages
+	$NonCached = array();
+	$NonCached[] = "/signup/";
+	$NonCached[] = "/login";
+} 
+
+
+function dmc_is_ssl() {
+	if ( isset($_SERVER['HTTPS']) ) {
+		if ( 'on' == strtolower($_SERVER['HTTPS']) )
+			return true;
+		if ( '1' == $_SERVER['HTTPS'] )
+			return true;
+	} elseif ( isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
+		return true;
+	}
+	return false;
+}
+
+function dmc_get_host() {
+    if ($host = $_SERVER['HTTP_X_FORWARDED_HOST'])
+    {
+        $elements = explode(',', $host);
+
+        $host = trim(end($elements));
+    }
+    else
+    {
+        if (!$host = $_SERVER['HTTP_HOST'])
+        {
+            if (!$host = $_SERVER['SERVER_NAME'])
+            {
+                $host = !empty($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : '';
+            }
+        }
+    }
+
+    // Remove port number from host
+    $host = preg_replace('/:\d+$/', '', $host);
+
+    return trim($host);
+}
 
 function dmc_doMemcacheConnect() {
 	global $dirtyMC;

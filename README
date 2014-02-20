@@ -2,4 +2,10 @@ This solution is uses output buffer caching to provide the fastest possible cach
 
 It caches only non-logged-in access of the pages and after a page is first generated, it loads NONE of WordPess.  This means it has a lower execution cost than any WordPress plugin can achieve.
 
+Plugins or themes that use output buffering agressively could interfere with DirtyMC. Testing is always recommended.
+
+A change in WordPress 3.6 creates unique cookie hashes per site.  This change necessitates the creation of a constant that includes the site URL.  This change has not been tested under WordPress MultiSite. A MS configuration using multiple URLs will likely no longer be compatible with this plugin as written.
+
+Please edit dirtymc-config.php and define a value for DMC_COOKIEHASH prior using DirtyMC.
+
 This solution was inspired and originaly coded by Henry Rivera.
